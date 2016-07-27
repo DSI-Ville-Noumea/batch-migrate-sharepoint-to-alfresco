@@ -7,3 +7,6 @@ cache:
 before_install:
 - export TZ=Pacific/Noumea
 install: mvn install checksum:files -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+notifications:
+  slack: dsi-mairie-noumea:kxFNiotAW8FlTAlvbeYtLEqm
+    
