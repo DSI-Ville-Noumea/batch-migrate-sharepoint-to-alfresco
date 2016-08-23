@@ -171,10 +171,14 @@ public class EaeWriter<T> implements ItemWriter<EaeFinalisation> {
 		    	logger.debug(e.getMessage());
 				eaeFinal.setCommentaireAlfresco("CmisConstraintException " + pathDestination + nomEae);
 		    	continue;
+		    } catch(NoContentException e) {
+		    	logger.error("NoContentException " + pathDestination + nomEae);
+				eaeFinal.setCommentaireAlfresco("NoContentException " + pathDestination + nomEae + " : " + e.getMessage());
+		    	continue;
 		    } catch(Exception e) {
 		    	logger.error("Exception " + pathDestination + nomEae);
 		    	logger.debug(e.getMessage());
-				eaeFinal.setCommentaireAlfresco("Exception " + pathDestination + nomEae);
+				eaeFinal.setCommentaireAlfresco("Exception " + pathDestination + nomEae + " : " + e.toString());
 		    	continue;
 		    } finally {
 				IOUtils.closeQuietly(stream);
@@ -246,7 +250,7 @@ public class EaeWriter<T> implements ItemWriter<EaeFinalisation> {
 	public String readResponseNTLM(HttpResponse response) {
 
 		if (response.getStatusLine().getStatusCode() == HttpStatus.NO_CONTENT.value()) {
-			return null;
+			throw new NoContentException();
 		}
 
 		if (response.getStatusLine().getStatusCode() != HttpStatus.OK.value()) {
