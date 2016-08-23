@@ -155,10 +155,10 @@ public class BatchConfiguration {
 	 * @return the Job
 	 */
 	@Bean
-	public Job importDocumentSIRH(JobBuilderFactory jobs, 
+	public Job importEAESharepoint(JobBuilderFactory jobs, 
 			@Qualifier("stepMigrateEae") Step stepMigrateEae
 			) {
-		return jobs.get("importDocumentSIRH").incrementer(new RunIdIncrementer())
+		return jobs.get("importEAESharepoint").incrementer(new RunIdIncrementer())
                 .listener(listener())
                 .flow(stepMigrateEae)
                 .end().build();
