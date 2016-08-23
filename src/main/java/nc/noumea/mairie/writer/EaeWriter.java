@@ -47,6 +47,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 
 public class EaeWriter<T> implements ItemWriter<EaeFinalisation> {
 
@@ -80,25 +81,28 @@ public class EaeWriter<T> implements ItemWriter<EaeFinalisation> {
 	private String kiosqueUrlWebdav;
 	private String kiosquePortWebdav;
 	private String kiosqueUrlGedSharepoint;
-	
+
+	@Override
+	@Transactional(value = "eaeTransactionManager")
 	public void write(List<? extends EaeFinalisation> items) throws Exception {
 		
 		logger.info("START EaeWriter write with items size : " + items.size()); 
 		
 		Session session = createSession.getSession(alfrescoUrl, alfrescoLogin, alfrescoPassword);
 		
-		org.hibernate.Session currentSession = sessionFactory.getCurrentSession();		
-		
-		for (final EaeFinalisation eaeFinal : items) {
+		for (EaeFinalisation eaeFinal : items) {
 			
 			// on cherche le repertoire distant 
 			CmisObject object = null;
+			
+			eaeFinal = eaeRepository.findEntity(EaeFinalisation.class, eaeFinal.getIdEaeFinalisation());
 			
 			EaeEvalue evalue = eaeRepository.getEaeEvalue(eaeFinal.getEae().getIdEae());
 			
 			AgentGeneriqueDto agentDto = sirhWsConsumer.getAgent(evalue.getIdAgent());
 			if(null == agentDto) {
 				logger.error(AGENT_NOT_FOUND + evalue.getIdAgent());
+				eaeFinal.setCommentaireAlfresco(AGENT_NOT_FOUND + evalue.getIdAgent());
 				continue;
 			}
 				
@@ -111,12 +115,24 @@ public class EaeWriter<T> implements ItemWriter<EaeFinalisation> {
 			try {
 				object = session.getObject(cmisService.getIdObjectCmis(pathDestination, session));
 			} catch(CmisObjectNotFoundException e) {
+				// si non trouve, on cree l arborescence agent
+				logger.debug(ERROR_PATH + pathDestination);
+				cmisService.createArborescenceAgent(evalue.getIdAgent(), nom, prenom, session);
+			}
+
+			// une fois l arborescence creee, on recherche de nouveau le dossier
+			// distant alfresco
+			try {
+				object = session.getObject(cmisService.getIdObjectCmis(pathDestination, session));
+			} catch (CmisObjectNotFoundException e) {
 				logger.error(ERROR_PATH + pathDestination);
+				eaeFinal.setCommentaireAlfresco(ERROR_PATH + pathDestination);
 				continue;
 			}
 			
 		    if(null == object) {
 		    	logger.error(ERROR_PATH + pathDestination);
+				eaeFinal.setCommentaireAlfresco(ERROR_PATH + pathDestination);
 		    	continue;
 		    }
 
@@ -148,14 +164,17 @@ public class EaeWriter<T> implements ItemWriter<EaeFinalisation> {
 		    } catch(CmisContentAlreadyExistsException e) {
 		    	logger.error("CmisContentAlreadyExistsException "  + pathDestination + nomEae);
 		    	logger.debug(e.getMessage());
-		    	continue;
+		    	doc = (Document) session.getObject(cmisService.getIdObjectCmis(pathDestination + nomEae, session));
+				eaeFinal.setCommentaireAlfresco("CmisContentAlreadyExistsException "  + pathDestination + nomEae);
 		    } catch(CmisConstraintException e) {
 		    	logger.error("CmisConstraintException " + pathDestination + nomEae);
 		    	logger.debug(e.getMessage());
+				eaeFinal.setCommentaireAlfresco("CmisConstraintException " + pathDestination + nomEae);
 		    	continue;
 		    } catch(Exception e) {
 		    	logger.error("Exception " + pathDestination + nomEae);
 		    	logger.debug(e.getMessage());
+				eaeFinal.setCommentaireAlfresco("Exception " + pathDestination + nomEae);
 		    	continue;
 		    } finally {
 				IOUtils.closeQuietly(stream);
@@ -181,11 +200,7 @@ public class EaeWriter<T> implements ItemWriter<EaeFinalisation> {
 			doc.updateProperties(props);
 			
 			// on sauvegarde l EAE avec l ID NODE ALFRESCO
-			//TODO mettre a jour BDD
-//			etatPayeur.setNodeRefAlfresco(doc.getProperty("alfcmis:nodeRef").getFirstValue().toString());
-//			if (!currentSession.contains(etatPayeur)) {
-//				currentSession.saveOrUpdate(etatPayeur);
-//			}
+			eaeFinal.setNodeRefAlfresco(doc.getProperty("alfcmis:nodeRef").getFirstValue().toString());
 		}
 		
 		logger.info("FINISH EaeWriter write with items size : " + items.size()); 

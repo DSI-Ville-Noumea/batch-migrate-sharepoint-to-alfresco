@@ -20,6 +20,10 @@ public class EaeRepository {
 		eaeEntityManager.persist(obj);
 	}
 	
+	public <T> T findEntity(Class<T> entityClass, Integer primaryKey) {
+		return eaeEntityManager.find(entityClass, primaryKey);
+	}
+	
 	public EaeEvalue getEaeEvalue(Integer idEae) {
 		
 		StringBuilder sb = new StringBuilder();

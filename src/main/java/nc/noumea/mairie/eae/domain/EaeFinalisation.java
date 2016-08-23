@@ -22,7 +22,7 @@ import javax.validation.constraints.NotNull;
 @Table(name = "EAE_FINALISATION")
 @PersistenceUnit(unitName = "eaePersistenceUnit")
 @NamedQueries ({
-	@NamedQuery(name = "getListEaeFinalisation", query = "select e from EaeFinalisation e order by idEaeFinalisation ")
+	@NamedQuery(name = "getListEaeFinalisation", query = "select e from EaeFinalisation e where e.nodeRefAlfresco is NULL order by idEaeFinalisation ")
 })
 public class EaeFinalisation {
 
@@ -54,6 +54,12 @@ public class EaeFinalisation {
 	@OneToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "ID_EAE")
 	private Eae eae;
+
+	@Column(name = "NODE_REF_ALFRESCO")
+	private String nodeRefAlfresco;
+
+	@Column(name = "COMMENTAIRE_ALFRESCO")
+	private String commentaireAlfresco;
 
 
 	public Integer getIdEaeFinalisation() {
@@ -110,6 +116,22 @@ public class EaeFinalisation {
 
 	public void setEae(Eae eae) {
 		this.eae = eae;
+	}
+
+	public String getNodeRefAlfresco() {
+		return nodeRefAlfresco;
+	}
+
+	public void setNodeRefAlfresco(String nodeRefAlfresco) {
+		this.nodeRefAlfresco = nodeRefAlfresco;
+	}
+
+	public String getCommentaireAlfresco() {
+		return commentaireAlfresco;
+	}
+
+	public void setCommentaireAlfresco(String commentaireAlfresco) {
+		this.commentaireAlfresco = commentaireAlfresco;
 	}
 	
 }
