@@ -131,7 +131,11 @@ public class EaeFinalisation {
 	}
 
 	public void setCommentaireAlfresco(String commentaireAlfresco) {
-		this.commentaireAlfresco = commentaireAlfresco;
+		if(commentaireAlfresco!=null && commentaireAlfresco.length()>200){
+			this.commentaireAlfresco = commentaireAlfresco.substring(0, 200);			
+		}else{
+			this.commentaireAlfresco = commentaireAlfresco;
+		}
 	}
 	
 }
