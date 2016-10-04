@@ -3,6 +3,7 @@
   <groupId>nc.noumea.mairie</groupId>
   <artifactId>batch-migrate-sharepoint-to-alfresco</artifactId>
   <version>1.1</version>
+  
   <name>batch-migrate-sharepoint-to-alfresco</name>
   <description>Migration des documents EAE de Sharepoint vers Alfresco</description>
   
