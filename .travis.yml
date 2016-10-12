@@ -12,10 +12,10 @@ notifications:
     rooms:
       secure: cX4csYKQt1dmhudVVDPSPg7GaoxQ/Bl0UsOXbyuUqY7YL/wg10JHRc2nW4S/fqdcKWL3IlZIFxbK9E03PKrLHIqA7ZJthKEvxwGCdMB6z7J08ztSQMGsi3XRd7pMHz7H49dVDZc7IpiAuyUROkG/Fi3IxMMBzIb65uC2WKAEJnNP1xPRAHd4NDtzZI0UsWUoLH2fdvaJOJpY2aLiUF5NKth1QJrSYfGDVH5H8vfsbjiBLPiHEJYWOzW/yjcQpi32AkrQD2DDXYOIvnKJbbrtk/OI87yQSE/k1fUqa6OL41ZmHmwKQimGo02ybNvkksgTYL65zbZjWTQ5dOjmMaJ1OPXmfaXLxooW1cdOIW54voHWzXNO7n/695Lo/ElSZ2gDPf6WmXNijasMuYkAFVAdSQIABMXnYFSoaFktWn5IqSH7glrSxFaZTTI3F18BG50oq8Z31KtazhTUkTcX2FHZPXmR/rUgIDA7zGGPbLcPlSl0s6OziorOUCBmzohhkVrsiuEoQohDvVNpUbCOKiqeTGlaNGiuXOMAZ++Cbe7qXbtbspb7bIrvrBPZ1JB0cDPrJZIPlVeVjenJA2XAe9c21vqAXstvma0ugTiexmKdwWI+xYjs3G3aIMOdgsO7yqQu8ihcsyEeupKJy17Cd8NvYopOaLTBZw9imxti+qmqwRU=
 before_deploy:
- - export RELEASE_PKG_FILE=$(ls target/*.jar)
- - export RELEASE_PKG_MD5_FILE=$(ls target/*.jar.md5)
- - export RELEASE_PKG_SHA_FILE=$(ls target/*.jar.sha1)
- - echo "deploying $RELEASE_PKG_FILE , $RELEASE_PKG_MD5_FILE , $RELEASE_PKG_SHA_FILE to GitHub releases"
+  - export RELEASE_PKG_FILE=$(ls target/*.jar)
+  - export RELEASE_PKG_MD5_FILE=$(ls target/*.jar.md5)
+  - export RELEASE_PKG_SHA_FILE=$(ls target/*.jar.sha1)
+  - echo "deploying $RELEASE_PKG_FILE , $RELEASE_PKG_MD5_FILE , $RELEASE_PKG_SHA_FILE to GitHub releases"
 deploy:
   provider: releases
   api_key:
@@ -26,5 +26,5 @@ deploy:
   - "${RELEASE_PKG_SHA_FILE}"
   skip_cleanup: true
   on:
-   tags: true
-   repo: DSI-Ville-Noumea/batch-migrate-sharepoint-to-alfresco
+    tags: true
+    repo: DSI-Ville-Noumea/batch-migrate-sharepoint-to-alfresco
